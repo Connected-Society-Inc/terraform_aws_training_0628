@@ -1,3 +1,8 @@
+variable "resource_name_prefix" {
+    type = string
+    description = "Prefix added to the name tags"
+}
+
 variable "vpc_cidr_block" {
     type = string
     description = "CIDR block of your VPC"
