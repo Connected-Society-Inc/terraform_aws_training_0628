@@ -2,14 +2,16 @@
 - hosts: localhost
   tasks:
 
-  # VPC
+  - name: VPC
 
-  # Subnet
-
+  - name: Subnets
+#...
 
   - name: EC2
     ec2:
-      count: 2
+      tag_count: 2
+      tag_name: Ansible
       instance_type: t3.micro
       region: us-west-2
       image: ami-0721c9af7b9b75114
+
