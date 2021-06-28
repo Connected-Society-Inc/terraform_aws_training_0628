@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  tasks:
+
+  # VPC
+
+  # Subnet
+
+
+  - name: EC2
+    ec2:
+      count: 2
+      instance_type: t3.micro
+      region: us-west-2
+      image: ami-0721c9af7b9b75114
