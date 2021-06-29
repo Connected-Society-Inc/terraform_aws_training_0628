@@ -24,7 +24,6 @@ resource "aws_instance" "ec2" {
     }    
 }
 
-// -sg allow_http 
 // +sg allow_ports 
 
 resource "aws_security_group" "allow_ports" {
