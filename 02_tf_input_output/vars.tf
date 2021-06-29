@@ -15,3 +15,9 @@ variable "subnet_cidr_block" {
     description = "CIDR block of your Subnet"
     default = "10.1.1.0/24"
 }
+
+variable "instance_type" {
+    type = string
+    description = "Type of the EC2 instance"
+    default = "t3.micro"
+}
