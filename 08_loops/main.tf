@@ -8,11 +8,12 @@ locals {
 }
 
 resource "aws_vpc" "vpc" {
-    cidr_block = locals.vpc_cidr_block    
+    cidr_block = local.vpc_cidr_block    
 }
 
 // Task: create a subnet for each cidr block defined in the local.subnet_cidr_blocks list
 resource "aws_subnet" "subnet" {
+    count      = length(local.subnet_cidr_blocks)
     vpc_id     = aws_vpc.vpc.id
     // cidr_block = 
 }
