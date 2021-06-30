@@ -17,7 +17,7 @@ resource "aws_instance" "ec2" {
         Name: count.index % 2 == 0 ? "even" : "odd"
     }
 }
-
+ 
 output "public_ips" {
     value = aws_instance.ec2[*].public_ip
 }
