@@ -117,7 +117,7 @@ resource "aws_nat_gateway" "nat_gw" {
     
     allocation_id = aws_eip.nat_ip[0].id
 }
-/*
+
 resource "aws_route_table" "public_route" {
     vpc_id     = aws_vpc.vpc.id
     route {
@@ -127,13 +127,15 @@ resource "aws_route_table" "public_route" {
 }
 
 resource "aws_route_table" "private_route" {
+    count = length([ for subnet in var.subnet_configuration: subnet if subnet.public == false ]) > 0 ? 1 : 0
+    
     vpc_id     = aws_vpc.vpc.id
     route {
         cidr_block     = "0.0.0.0/0"
-        nat_gateway_id = aws_nat_gateway.nat.id
+        nat_gateway_id = aws_nat_gateway.nat[0].id
     }
 }
-
+/*
 resource "aws_route_table_association" "public" {
     # associate public_route to all public subnets
     # subnet_id = 
