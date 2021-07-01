@@ -78,27 +78,6 @@ resource "aws_vpc" "vpc" {
     enable_dns_hostnames = true
 }
 
-/*
-resource "aws_internet_gateway" "gw" {
-    vpc_id = aws_vpc.vpc.id
-}
-
-resource "aws_eip" "nat_ip" {
-    // TODO: create this one if you have at least one private subnet (same as nat_gw)
-    # count = 0/1
-}
-
-# We need just one nat gw, but needs to be placed into a public subnet
-resource "aws_nat_gateway" "nat_gw" {
-    # TODO: create this resource only if we have at least one private subnet
-    # count = 1 or 0 depending if you have any private subnet defined
-    
-    // TODO: place this nat gw into a public subnet! (find the first public subnet in the configuration)
-    // subnet_id     = 
-    
-    allocation_id = aws_eip.nat_ip.id
-}
-
 resource "aws_subnet" "subnets" {
     for_each = var.subnet_configuration
     
@@ -112,6 +91,33 @@ resource "aws_subnet" "subnets" {
     }
 }
 
+
+resource "aws_internet_gateway" "gw" {
+    vpc_id = aws_vpc.vpc.id
+}
+
+locals {
+  first_public_subnet_name = [ for subnet_name, subnet_conf in var.subnet_configuration: subnet_name if subnet_conf.public == true ][0]
+}
+
+resource "aws_eip" "nat_ip" {
+    // TODO: create this one if you have at least one private subnet (same as nat_gw)
+    # count = 0/1
+    count = length([ for subnet in var.subnet_configuration: subnet if subnet.public == false ]) > 0 ? 1 : 0
+}
+
+# We need just one nat gw, but needs to be placed into a public subnet
+resource "aws_nat_gateway" "nat_gw" {
+    # TODO: create this resource only if we have at least one private subnet
+    # count = 1 or 0 depending if you have any private subnet defined
+    count = length([ for subnet in var.subnet_configuration: subnet if subnet.public == false ]) > 0 ? 1 : 0
+    
+    // TODO: place this nat gw into a public subnet! (find the first public subnet in the configuration)
+    subnet_id     = aws_subnet.subnets[local.first_public_subnet_name].id
+    
+    allocation_id = aws_eip.nat_ip[0].id
+}
+/*
 resource "aws_route_table" "public_route" {
     vpc_id     = aws_vpc.vpc.id
     route {
