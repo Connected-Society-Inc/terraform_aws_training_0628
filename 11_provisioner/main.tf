@@ -43,6 +43,8 @@ resource "aws_instance" "ec2" {
     // user_data = "yum install ..." <== This would be much better than using provisioners! (if you can)
 }
 
+// This null_resource will be re-created when the script.sh file changed
+// when the script file changes, provisiorners below will run
 resource "null_resource" "null" {
 
     // null_resource won't be provisoned before the ec2 instance
@@ -68,6 +70,16 @@ resource "null_resource" "null" {
     }   
 }
 
+resource "null_resource" "null_all_time" {
+
+    triggers = {
+        random = uuid()
+    }
+
+    provisioner "local-exec" {
+        command = "./post_apply.sh"
+    }
+}
 
 // ========================================================================================
 
