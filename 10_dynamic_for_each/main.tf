@@ -66,7 +66,7 @@ resource "aws_security_group" "allow_ports_with_sources" {
             cidr_blocks = my_iterator.value # this is already a list
             from_port   = tonumber(my_iterator.key)
             to_port     = tonumber(my_iterator.key)
-        }    
+        }
     }
     
     egress {
