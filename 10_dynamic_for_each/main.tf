@@ -8,6 +8,15 @@ variable "open_ports" {
     description = "List of port numbers to be opened on the instance"
 }
 
+variable "open_ports_with_sources" {
+    type = map(list(string))
+    default = {
+        // list defines the source IPs
+        "22" = ["10.1.0.0/16", "10.2.0.0/16"],
+        "80" = ["10.1.0.0/16", "10.2.0.0/16"]
+    }
+}
+
 variable "vpc_id" {
     type = string
 }
@@ -32,6 +41,31 @@ resource "aws_security_group" "allow_ports" {
             cidr_blocks = ["0.0.0.0/0"]
             from_port   = it.value
             to_port     = it.value
+        }    
+    }
+    
+    egress {
+        from_port        = 0
+        to_port          = 0
+        protocol         = "-1"
+        cidr_blocks      = ["0.0.0.0/0"]
+        ipv6_cidr_blocks = ["::/0"]
+    }
+}
+
+resource "aws_security_group" "allow_ports_with_sources" {    
+    name   = "allow_ports_with_sources"
+    vpc_id = var.vpc_id
+
+    dynamic "ingress" {
+        # this for_each is not identical to for_each in line 21
+        for_each = var.open_ports_with_sources
+        iterator = my_iterator # set the name of the iterator, which can be any name, but "each" (!!)
+        content {
+            protocol    = "TCP"
+            cidr_blocks = my_iterator.value # this is already a list
+            from_port   = tonumber(my_iterator.key)
+            to_port     = tonumber(my_iterator.key)
         }    
     }
     
