@@ -128,23 +128,31 @@ resource "aws_route_table" "public_route" {
 
 resource "aws_route_table" "private_route" {
     count = length([ for subnet in var.subnet_configuration: subnet if subnet.public == false ]) > 0 ? 1 : 0
-    
+
     vpc_id     = aws_vpc.vpc.id
     route {
         cidr_block     = "0.0.0.0/0"
-        nat_gateway_id = aws_nat_gateway.nat[0].id
+        nat_gateway_id = aws_nat_gateway.nat_gw[0].id
     }
 }
-/*
+
+locals {
+    public_subnet_names  = [ for subnet_name, subnet_conf in var.subnet_configuration: subnet_name if subnet_conf.public == true ]
+    private_subnet_names = [ for subnet_name, subnet_conf in var.subnet_configuration: subnet_name if subnet_conf.public == false ]
+}
+
 resource "aws_route_table_association" "public" {
+    for_each = toset(local.public_subnet_names)
+
     # associate public_route to all public subnets
-    # subnet_id = 
+    subnet_id      = aws_subnet.subnets[each.key].id
     route_table_id = aws_route_table.public_route.id
 }
 
 resource "aws_route_table_association" "private" {
+    for_each = toset(local.private_subnet_names)
+
     # associate private_route table to all private subnets
-    # subnet_id = 
-    route_table_id = aws_route_table.private_route.id
+    subnet_id      = aws_subnet.subnets[each.key].id
+    route_table_id = aws_route_table.private_route[0].id
 }
-*/
