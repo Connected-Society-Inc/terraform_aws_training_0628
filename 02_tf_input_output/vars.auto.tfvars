@@ -1,3 +1,6 @@
 vpc_cidr_block="10.1.0.0/16"
 resource_name_prefix="terraform-course"
 
+# we also can use environment variables to set these
+# export TF_VAR_vpc_cidr_block=...
+# export TF_VAR_resource_name_prefix=...
